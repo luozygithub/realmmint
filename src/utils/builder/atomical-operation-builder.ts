@@ -466,8 +466,13 @@ export class AtomicalOperationBuilder {
   }
 
   async prepareStartSetup(): Promise<OperationSetup> {
+    // 获取账户相关信息（包含私钥部分）
+    // const fundingKeypairRaw = ECPair.fromWIF(await this.fundingWIFCallback());
+    // const fundingKeypair = getKeypairInfo(fundingKeypairRaw);
+    // 改成公钥获取
     const fundingKeypairRaw = ECPair.fromWIF(await this.fundingWIFCallback());
     const fundingKeypair = getKeypairInfo(fundingKeypairRaw);
+
     console.log("fundingKeypair",fundingKeypair)
     let performBitworkForRevealTx = !!this.bitworkInfoReveal;
     let performBitworkForCommitTx = !!this.bitworkInfoCommit;

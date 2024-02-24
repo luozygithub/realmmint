@@ -89,7 +89,7 @@ export function* getFundingDepositUtxoRequest(action) {
     client = factory.create();
     try {
         const {address, satoshis} = action.payload;
-
+        console.log(address)
         console.log('getFundingDepositRequest', action.payload);
         const response: any = yield client.getUnspentAddress(address);
         console.log(response)
@@ -105,11 +105,14 @@ export function* getFundingDepositUtxoRequest(action) {
 }
 
 export function* startMintRequest(action) {
+    console.log("start")
     yield delay(200);
     const feeEstimate = yield select(selectEstimateFee);
     const primaryAddress = yield select(selectPrimaryAddress);
     const realmName = yield select(selectName);
     const decryptedFundingKey = yield select(selectDecryptedFundingKey);
+
+    console.log(feeEstimate,primaryAddress,realmName,decryptedFundingKey)
     let client: ElectrumApiInterface;
     const mockFactory = new ElectrumApiMockFactory(undefined);
     const factory = new ElectrumApiFactory(remoteElectrumxUrl + '', mockFactory.getMock());
@@ -132,7 +135,7 @@ export function* startMintRequest(action) {
         callbackProgress: p => callbackProgress(p),
     };
     const fundingWIFCallback = () => {
-        return decryptedFundingKey; // mock sample to simulate fee
+        return "KxhN4Jxps577BbCqt4AqiRgzRN3wRuQ8Xd9dZCBnyukZaNF6kU8m"; // mock sample to simulate fee
     };
     const address = primaryAddress;
     // Get the atomicals operation builder

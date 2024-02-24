@@ -1,4 +1,6 @@
 /* eslint-disable import/first */
+import {networks} from "bitcoinjs-lib";
+
 const bip39 = require('bip39');
 import BIP32Factory from 'bip32';
 //import * as ecc from '@bitcoin-js/tiny-secp256k1-asmjs';
@@ -9,6 +11,7 @@ window['Buffer'] = window['Buffer'] || Buffer;
 window['bitcoin'] = window['bitcoin'] || {};
 window['bitcoin'].initEccLib(ecc);
 var bitcoin = window['bitcoin'];
+export const NETWORK = process.env.REACT_APP_ELECTRUMX_NETWORK === 'testnet' ? networks.testnet : process.env.REACT_APP_ELECTRUMX_NETWORK == "regtest" ? networks.regtest : networks.bitcoin;
 
 export interface ExtendTaprootAddressScriptKeyPairInfo {
   address: string;
@@ -70,10 +73,8 @@ export const getKeypairInfo = (childNode: any): KeyPairInfo => {
   // The output is the same no matter what the network is.
   const { address, output } = bitcoin.payments.p2tr({
     internalPubkey: childNodeXOnlyPubkey,
-
-    netword:process.env.REACT_APP_ELECTRUMX_NETWORK?process.env.REACT_APP_ELECTRUMX_NETWORK:"testnet"
+    network: NETWORK
   });
-
   // Used for signing, since the output and address are using a tweaked key
   // We must tweak the signer in the same way.
   const tweakedChildNode = childNode.tweak(
@@ -82,9 +83,11 @@ export const getKeypairInfo = (childNode: any): KeyPairInfo => {
 
   return {
     address,
-    tweakedChildNode,
     childNodeXOnlyPubkey,
     output,
+
     childNode,
+    tweakedChildNode,
+
   };
 };

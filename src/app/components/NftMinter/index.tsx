@@ -210,12 +210,7 @@ export function NftMinter({ name, primaryAddress }: Props) {
             </DetectedFundingUtxo>
             <InitiateMint expectedSatoshis={requiredFundingSatoshis} fundingDepositUtxo={fundingDepositUtxo} onStartMint={onStartMint} onDecryptWallet={onDecryptWallet} decryptedFundingKey={decryptedFundingKey} />
           </>}
-          <>
-            <DetectedFundingUtxo className="mt-3 mb-3">
-              <A href={getFundingUtxoLink()} target="blank">Funding payment received!</A>
-            </DetectedFundingUtxo>
-            <InitiateMint expectedSatoshis={requiredFundingSatoshis} fundingDepositUtxo={fundingDepositUtxo} onStartMint={onStartMint} onDecryptWallet={onDecryptWallet} decryptedFundingKey={decryptedFundingKey} />
-          </>
+
         </WrapperBorder>
       </div>}
 
