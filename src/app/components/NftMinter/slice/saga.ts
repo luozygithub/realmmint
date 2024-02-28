@@ -40,6 +40,7 @@ export function* getEstimateFeeRequest() {
 }
 
 export function* getRequiredSatoshisAmountRequest() {
+
     const feeEstimate = yield select(selectEstimateFee);
     // const primaryAddress = yield select(selectPrimaryAddress);
     const primaryAddress = yield select(selectAccountAddr);

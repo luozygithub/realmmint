@@ -134,10 +134,18 @@ export function ConnectView({ onCompleted }: Props) {
     // @ts-ignore
     console.log("Login 11111111111111111111111111111111", action.payload,window.unisat)
     setTimeout(async ()=>{
+      try {
+        // @ts-ignore
+        let accounts = await window.unisat.requestAccounts();
+        console.log('connect success', accounts);
+        newSession.accounts = accounts
+        dispatch(globalSlice.actions.setEncryptedSession(newSession));
+      } catch (e) {
+        console.log('connect failed');
+      }
       // @ts-ignore
-      const accounts = await window.unisat.getAccounts()
-      newSession.accounts = accounts
-      dispatch(globalSlice.actions.setEncryptedSession(newSession));
+
+
     })
 
     dispatch(actions.clear());

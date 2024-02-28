@@ -23,8 +23,15 @@ export function ButtonConnected({ primaryAddress, disabled, block, onClick, clas
 
         // @ts-ignore
         const accounts = await window.unisat.getAccounts()
-        console.log(accounts)
-        setAccount(accounts[0])
+        if(accounts[0]){
+            setAccount(accounts[0])
+
+        }else{
+            // @ts-ignore
+            let accounts = await window.unisat.requestAccounts();
+            setAccount(accounts[0])
+        }
+
         dispatch(globalSlice.actions.setAccountAddr(accounts[0]));
         // @ts-ignore
         window.unisat.on("accountsChanged",async ()=>{
