@@ -8,6 +8,7 @@ import * as ecc from '@bitcoinerlab/secp256k1';
 // eslint-disable-next-line import/first
 window['bitcoin'].initEccLib(ecc);
 import * as cbor from 'borc';
+
 export const NETWORK = window["bitcoin"]['networks'][process.env.REACT_APP_ELECTRUMX_NETWORK?process.env.REACT_APP_ELECTRUMX_NETWORK:"testnet"];
 
 var script = window['bitcoin']['script'];
