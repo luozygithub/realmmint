@@ -654,7 +654,6 @@ export class AtomicalOperationBuilder {
                 address: fundingKeypair.address,
                 fundingUtxo
             });
-            console.log(111)
             printBitworkLog(this.bitworkInfoCommit as any, true);
             this.options.electrumApi.close();
             do {
@@ -673,6 +672,9 @@ export class AtomicalOperationBuilder {
                     prepareCommitRevealConfig(this.options.opType, fundingKeypair, atomPayload);
                 console.log("生成psbt")
                 let psbtStart = new Psbt({network: NETWORK});
+                // bitcoin bitcointx
+                let bitcointx = new bitcoin.Transaction();
+
                 psbtStart.setVersion(1);
                 psbtStart.addInput({
                     hash: fundingUtxo.txid,
@@ -688,6 +690,31 @@ export class AtomicalOperationBuilder {
                     address: updatedBaseCommit.scriptP2TR.address,
                     value: fees.revealFeePlusOutputs,
                 });
+                // bitcoin bitcointx
+
+                try{
+                    bitcointx.addInput({
+                        hash: Buffer.from(fundingUtxo.txid, 'hex'),
+                        index: fundingUtxo.index,
+                        witnessUtxo: {
+                            value: fundingUtxo.value,
+                            script: Buffer.from(fundingKeypair.output, 'hex'),
+                        },
+                        tapInternalKey: Buffer.from(fundingUtxo.txid, 'hex'),
+                    })
+
+                }catch (e) {
+                    console.log(e)
+                }
+                try{
+                    bitcointx.addOutput({
+                        address: updatedBaseCommit.scriptP2TR.address,
+                        value: fees.revealFeePlusOutputs,
+                    })
+                }catch (e) {
+                    console.log(e)
+                }
+
                 this.addCommitChangeOutputIfRequired(
                     fundingUtxo.value,
                     fees,
@@ -699,35 +726,35 @@ export class AtomicalOperationBuilder {
                 // psbtStart.signInput(0, fundingKeypair.tweakedChildNode);
                 //替换公钥
                 // @ts-ignore
-                let walletPublicKey = await window.unisat.getPublicKey();
-                console.log("插件签名",walletPublicKey )
-                try{
-                    // @ts-ignore
-                    await window.unisat.signPsbt(psbtStart.toHex(), {
-                        toSignInputs: [
-                            {
-                                index: 0, // 签名第一个输入
-                                publicKey: walletPublicKey,
-                                disableTweakSigner: true, // 根据需要启用或禁用特定选项
-                            },
-                        ]
-                    });
-                }catch (e) {
-                    console.error(e)
-                }
+                // let walletPublicKey = await window.unisat.getPublicKey();
+                // console.log("插件签名",walletPublicKey )
+                // try{
+                //     // @ts-ignore
+                //     await window.unisat.signPsbt(psbtStart.toHex(), {
+                //         toSignInputs: [
+                //             {
+                //                 index: 0, // 签名第一个输入
+                //                 publicKey: walletPublicKey,
+                //                 disableTweakSigner: true, // 根据需要启用或禁用特定选项
+                //             },
+                //         ]
+                //     });
+                // }catch (e) {
+                //     console.error(e)
+                // }
             // 假设所有签名操作都已经通过插件完成
                 let checkTxid
                 let prelimTx
-                try {
-
-                    console.log(" 假设所有签名操作都已经通过插件完成")
-                    psbtStart.finalizeAllInputs();
-                     prelimTx = psbtStart.extractTransaction();
-                    checkTxid = prelimTx.getId();
-                    // 广播tx或进行其他操作
-                } catch (error) {
-                    console.error("无法最终化PSBT: ", error);
-                }
+                // try {
+                //
+                //     console.log(" 假设所有签名操作都已经通过插件完成")
+                //     psbtStart.finalizeAllInputs();
+                //      prelimTx = psbtStart.extractTransaction();
+                //     checkTxid = prelimTx.getId();
+                //     // 广播tx或进行其他操作
+                // } catch (error) {
+                //     console.error("无法最终化PSBT: ", error);
+                // }
 
 
 
@@ -742,15 +769,29 @@ export class AtomicalOperationBuilder {
                 }
                 // add a `true ||` at the front to test invalid minting
                 // console.log('this.bitworkInfoCommit?.prefix', this.bitworkInfoCommit)
-                console.log("挖矿....", performBitworkForCommitTx, checkTxid, this.bitworkInfoCommit, hasValidBitwork(
-                    checkTxid,
-                    this.bitworkInfoCommit?.prefix as any,
-                    this.bitworkInfoCommit?.ext as any
-                ))
+
+
+
+                // bitcoin bitcointx
+                let txid = bitcointx.getId();
+
+
+                console.log(txid)
+                console.log("挖矿....", performBitworkForCommitTx, txid, this.bitworkInfoCommit, )
+                try{
+                    hasValidBitwork(
+                        txid,
+                        this.bitworkInfoCommit?.prefix as any,
+                        this.bitworkInfoCommit?.ext as any
+                    )
+                }catch (e) {
+                    console.log(e)
+                }
+
                 if (
                     performBitworkForCommitTx &&
                     hasValidBitwork(
-                        checkTxid,
+                        txid,
                         this.bitworkInfoCommit?.prefix as any,
                         this.bitworkInfoCommit?.ext as any
                     )
@@ -875,6 +916,10 @@ export class AtomicalOperationBuilder {
         noncesGenerated = 0;
         do {
             let nonce = Math.floor(Math.random() * 100000000);
+            console.log({
+                nonce
+            })
+
             let psbt = new Psbt({network: NETWORK});
             psbt.setVersion(1);
             psbt.addInput({
@@ -883,6 +928,8 @@ export class AtomicalOperationBuilder {
                 witnessUtxo: {value: utxoOfCommitAddress.value, script: hashLockP2TR.output!},
                 tapLeafScript: [tapLeafScript],
             });
+
+
             // Add any additional inputs that were assigned
             for (const additionalInput of this.inputUtxos) {
                 psbt.addInput({

@@ -295,6 +295,7 @@ export const hasAtomicalType = (type: string, atomicals: any[]): any => {
 };
 
 export const hasValidBitwork = (txid, bitwork: string, bitworkx: number) => {
+  console.log(txid,bitwork)
   if (txid.startsWith(bitwork)) {
     if (!bitworkx) {
       return true;
